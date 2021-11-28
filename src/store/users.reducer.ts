@@ -17,6 +17,10 @@ type AddUserAction = {
   user: Omit<User, 'id'>
 }
 
+type SelectUserAction = {
+  id: number
+}
+
 const initialState: UsersState = {
   users: [],
   nextId: 1,
@@ -34,10 +38,13 @@ export const usersSlice = createSlice({
 
       state.activeUser = newUser
     },
+    selectUser: (state, action: PayloadAction<SelectUserAction>) => {
+      state.activeUser = state.users.find(({ id }) => id === action.payload.id)
+    },
   },
 })
 
-export const { addUser } = usersSlice.actions
+export const { addUser, selectUser } = usersSlice.actions
 
 export const usersSelector = (state: RootState): User[] => state.users.users
 export const activeUserSelector = (state: RootState): User | undefined =>
