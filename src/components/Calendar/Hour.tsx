@@ -1,46 +1,57 @@
-import { Box, Text } from '@chakra-ui/react'
-import { set, startOfHour as startOfHourDFNS, format, isSameHour } from 'date-fns'
+import { Box, Text, useDisclosure } from '@chakra-ui/react'
+import {
+  set,
+  startOfHour as startOfHourDFNS,
+  format,
+  isSameHour,
+  isAfter,
+  isBefore,
+} from 'date-fns'
 import React, { useMemo } from 'react'
 
-import { activeUserEventsSelector, createEvent } from '../../store/events.reducer'
-import { useAppDispatch, useAppSelector } from '../../store/hooks'
-import { activeUserSelector } from '../../store/users.reducer'
+import { activeUserEventsSelector } from '../../store/events.reducer'
+import { useAppSelector } from '../../store/hooks'
+
+import { FormEventModal } from './FormEventModal'
 
 export const Hour: React.FC<{ hour: number; date: Date }> = ({ hour, date }) => {
-  const dispatch = useAppDispatch()
-  const activeUser = useAppSelector(activeUserSelector)
+  const { isOpen, onOpen, onClose, ...disclosureProps } = useDisclosure()
+
   const startOfHour = startOfHourDFNS(set(date, { hours: hour }))
 
   const activeUserEvents = useAppSelector(activeUserEventsSelector)
 
   const activeUserEventsForDate = useMemo(
-    () => activeUserEvents.find(({ date }) => isSameHour(date, startOfHour)),
+    () =>
+      activeUserEvents.find(
+        ({ startDate, endDate }) =>
+          (isBefore(startDate, startOfHour) || isSameHour(startDate, startOfHour)) &&
+          isAfter(endDate, startOfHour)
+      ),
     [startOfHour, activeUserEvents]
   )
 
   return (
-    <Box
-      key={hour}
-      h={50}
-      _hover={{ cursor: 'pointer', '& .hour': { fontWeight: 'bold' } }}
-      sx={activeUserEventsForDate ? { border: '1px solid black' } : undefined}
-      onClick={() =>
-        dispatch(
-          createEvent({
-            event: {
-              name: 'My event',
-              date: startOfHour.getTime(),
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              userId: activeUser!.id,
-            },
-          })
-        )
-      }
-    >
-      <Text fontSize={12} color="gray" className="hour">
-        {format(startOfHour, 'HH:mm')}
-      </Text>
-      {activeUserEventsForDate && <Text>{activeUserEventsForDate.name}</Text>}
-    </Box>
+    <>
+      <Box
+        key={hour}
+        h={50}
+        _hover={{ cursor: 'pointer', '& .hour': { fontWeight: 'bold' } }}
+        sx={activeUserEventsForDate ? { border: '1px solid black' } : undefined}
+        onClick={onOpen}
+      >
+        <Text fontSize={12} color="gray" className="hour">
+          {format(startOfHour, 'HH:mm')}
+        </Text>
+        {activeUserEventsForDate && <Text>{activeUserEventsForDate.name}</Text>}
+      </Box>
+      <FormEventModal
+        startHour={startOfHour}
+        isOpen={isOpen}
+        onOpen={onOpen}
+        onClose={onClose}
+        {...disclosureProps}
+      />
+    </>
   )
 }

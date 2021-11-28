@@ -13,6 +13,7 @@
   "plugins": ["@typescript-eslint", "prettier", "react", "import"],
   "rules": {
     "prettier/prettier": "error",
+    "react/display-name": "off",
     "import/order": [
       "error",
       {

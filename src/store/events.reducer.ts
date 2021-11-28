@@ -5,7 +5,8 @@ import { RootState } from './index'
 type Event = {
   id: number
   name: string
-  date: number
+  startDate: number
+  endDate: number
   userId: number
 }
 
@@ -28,9 +29,12 @@ export const eventsSlice = createSlice({
   initialState,
   reducers: {
     createEvent: (state, action: PayloadAction<CreateEventAction>) => {
+      const { startDate, endDate, ...eventProps } = action.payload.event
       state.events.push({
-        ...action.payload.event,
+        startDate: startDate,
+        endDate: endDate,
         id: state.nextId,
+        ...eventProps,
       })
       state.nextId += 1
     },
