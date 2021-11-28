@@ -1,10 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit'
 
+import { eventsReducer } from './events.reducer'
 import { usersReducer } from './users.reducer'
 
 export const store = configureStore({
   reducer: {
     users: usersReducer,
+    events: eventsReducer,
   },
 })
 

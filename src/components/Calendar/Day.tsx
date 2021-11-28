@@ -9,11 +9,11 @@ export const Day: React.FC<{ date: Date; hoursGridProps?: GridProps }> = ({
   hoursGridProps,
 }) => {
   return (
-    <Box px={4}>
+    <Box>
       <Text textAlign="center" fontWeight="bold" mb={10}>
         {format(date, 'dd/MM/yyyy')}
       </Text>
-      <Grid templateColumns="repeat(1fr, 24)" {...hoursGridProps}>
+      <Grid templateColumns="repeat(1fr, 24)" px={4} {...hoursGridProps}>
         {Array.from({ length: 24 }, (_, index) => (
           <Hour key={index} hour={index} date={date} />
         ))}
