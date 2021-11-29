@@ -14,15 +14,23 @@ import {
   Input,
   Alert,
   AlertIcon,
+  Box,
+  Flex,
 } from '@chakra-ui/react'
 import { add, isAfter, isBefore } from 'date-fns'
-import React, { useMemo, useRef } from 'react'
+import React, { useMemo, useState } from 'react'
 import DatePicker from 'react-datepicker'
 import { Controller, useForm, UseFormReturn } from 'react-hook-form'
 
 import 'react-datepicker/dist/react-datepicker.css'
 
-import { activeUserEventsSelector, createEvent } from '../../store/events.reducer'
+import {
+  activeUserEventsSelector,
+  createEvent,
+  deleteEvent,
+  editEvent,
+  Event,
+} from '../../store/events.reducer'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { activeUserSelector } from '../../store/users.reducer'
 
@@ -34,22 +42,30 @@ type EventFormData = {
   endDate: Date
 }
 
-export const CreateEventModal: React.FC<{ startHour: Date } & UseDisclosureReturn> = ({
-  startHour,
-  isOpen,
-  onClose,
-}) => {
+export const FormEventModal: React.FC<
+  { startHour: Date; event?: Event } & UseDisclosureReturn
+> = ({ event, startHour, isOpen, onClose }) => {
   const activeUser = useAppSelector(activeUserSelector)
   const dispatch = useAppDispatch()
-  const baseStartDate = useRef(startHour)
-  const baseEndDate = useRef(add(baseStartDate.current, { hours: 1 }))
+
+  const defaultValues = useMemo(
+    () =>
+      event
+        ? {
+            name: event.name,
+            startDate: new Date(event.startDate),
+            endDate: new Date(event.endDate),
+          }
+        : {
+            startDate: startHour,
+            endDate: add(startHour, { hours: 1 }),
+          },
+    [event, startHour]
+  )
 
   const methods = useForm<EventFormData>({
     mode: 'onBlur',
-    defaultValues: {
-      startDate: baseStartDate.current,
-      endDate: baseEndDate.current,
-    },
+    defaultValues,
   })
 
   const {
@@ -66,10 +82,12 @@ export const CreateEventModal: React.FC<{ startHour: Date } & UseDisclosureRetur
   const activeUserEvents = useAppSelector(activeUserEventsSelector)
   const activeUserEventsForDate = useMemo(
     () =>
-      activeUserEvents.find(({ startDate: eventStartDate, endDate: eventEndDate }) =>
-        checkDatesIntersection(eventStartDate, eventEndDate, startDate, endDate)
+      activeUserEvents.find(
+        ({ id, startDate: eventStartDate, endDate: eventEndDate }) =>
+          id !== event?.id &&
+          checkDatesIntersection(eventStartDate, eventEndDate, startDate, endDate)
       ),
-    [activeUserEvents, startDate, endDate]
+    [activeUserEvents, startDate, endDate, event]
   )
 
   return activeUser ? (
@@ -80,26 +98,34 @@ export const CreateEventModal: React.FC<{ startHour: Date } & UseDisclosureRetur
         <ModalCloseButton />
         <form
           onSubmit={handleSubmit((data) => {
+            onClose()
             dispatch(
-              createEvent({
-                event: {
-                  ...data,
-                  startDate: data.startDate.getTime(),
-                  endDate: data.endDate.getTime(),
-                  userId: activeUser.id,
-                },
-              })
+              event
+                ? editEvent({
+                    event: {
+                      ...event,
+                      name: data.name,
+                      startDate: data.startDate.getTime(),
+                      endDate: data.endDate.getTime(),
+                    },
+                  })
+                : createEvent({
+                    event: {
+                      ...data,
+                      startDate: data.startDate.getTime(),
+                      endDate: data.endDate.getTime(),
+                      userId: activeUser.id,
+                    },
+                  })
             )
             reset()
-            onClose()
           })}
         >
           <ModalBody>
-            <FormControl mr={10}>
+            <FormControl isInvalid={!!errors.name} mb={4}>
               <FormLabel>Name</FormLabel>
               <Input
                 type="text"
-                id="name"
                 placeholder="Event name"
                 {...register('name', { required: true })}
               />
@@ -122,20 +148,54 @@ export const CreateEventModal: React.FC<{ startHour: Date } & UseDisclosureRetur
             )}
           </ModalBody>
 
-          <ModalFooter>
-            <Button
-              isDisabled={!!activeUserEventsForDate}
-              colorScheme="blue"
-              mr={3}
-              type="submit"
-            >
-              Save
-            </Button>
+          <ModalFooter d="flex" justifyContent="space-between">
+            <Box>{!!event && <DeleteButton event={event} onClose={onClose} />}</Box>
+
+            <Box>
+              <Button mr={3} onClick={onClose}>
+                Cancel
+              </Button>
+              <Button
+                isDisabled={!!activeUserEventsForDate}
+                colorScheme="blue"
+                type="submit"
+              >
+                Save
+              </Button>
+            </Box>
           </ModalFooter>
         </form>
       </ModalContent>
     </Modal>
   ) : null
+}
+
+const DeleteButton: React.FC<{ event: Event; onClose: () => void }> = ({
+  event,
+  onClose,
+}) => {
+  const dispatch = useAppDispatch()
+  const [state, setState] = useState(false)
+
+  return state ? (
+    <Flex>
+      <Button onClick={() => setState(false)}>No</Button>
+      <Button
+        colorScheme="red"
+        ml={3}
+        onClick={() => {
+          dispatch(deleteEvent({ id: event.id }))
+          onClose()
+        }}
+      >
+        Yes
+      </Button>
+    </Flex>
+  ) : (
+    <Button colorScheme="red" onClick={() => setState(true)}>
+      Delete
+    </Button>
+  )
 }
 
 const ControlledDateRangePicker: React.FC<{
@@ -150,7 +210,7 @@ const ControlledDateRangePicker: React.FC<{
 
   return (
     <>
-      <FormControl isInvalid={!!errors.startDate} mr={10}>
+      <FormControl isInvalid={!!errors.startDate} mb={4}>
         <FormLabel>Start date</FormLabel>
         <Controller
           control={control}

@@ -45,13 +45,16 @@ export const Hour: React.FC<{ hour: number; date: Date }> = ({ hour, date }) => 
         </Text>
         {activeUserEventsForDate && <Text>{activeUserEventsForDate.name}</Text>}
       </Box>
-      <FormEventModal
-        startHour={startOfHour}
-        isOpen={isOpen}
-        onOpen={onOpen}
-        onClose={onClose}
-        {...disclosureProps}
-      />
+      {isOpen && (
+        <FormEventModal
+          event={activeUserEventsForDate}
+          startHour={startOfHour}
+          isOpen={isOpen}
+          onOpen={onOpen}
+          onClose={onClose}
+          {...disclosureProps}
+        />
+      )}
     </>
   )
 }
