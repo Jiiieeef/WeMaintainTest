@@ -13,6 +13,7 @@ import { activeUserEventsSelector } from '../../store/events.reducer'
 import { useAppSelector } from '../../store/hooks'
 
 import { FormEventModal } from './FormEventModal'
+import { useGetEventStyles } from './utils'
 
 export const Hour: React.FC<{ hour: number; date: Date }> = ({ hour, date }) => {
   const { isOpen, onOpen, onClose, ...disclosureProps } = useDisclosure()
@@ -31,19 +32,28 @@ export const Hour: React.FC<{ hour: number; date: Date }> = ({ hour, date }) => 
     [startOfHour, activeUserEvents]
   )
 
+  const { border, borderTop, borderBottom, displayEventName } =
+    useGetEventStyles(activeUserEventsForDate, startOfHour) || {}
+
   return (
     <>
       <Box
         key={hour}
         h={50}
         _hover={{ cursor: 'pointer', '& .hour': { fontWeight: 'bold' } }}
-        sx={activeUserEventsForDate ? { border: '1px solid black' } : undefined}
+        sx={{
+          ...border,
+          ...borderTop,
+          ...borderBottom,
+        }}
         onClick={onOpen}
       >
         <Text fontSize={12} color="gray" className="hour">
           {format(startOfHour, 'HH:mm')}
         </Text>
-        {activeUserEventsForDate && <Text>{activeUserEventsForDate.name}</Text>}
+        {activeUserEventsForDate && displayEventName && (
+          <Text>{activeUserEventsForDate.name}</Text>
+        )}
       </Box>
       {isOpen && (
         <FormEventModal
