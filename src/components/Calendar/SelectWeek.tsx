@@ -1,7 +1,8 @@
 import { Box, Flex, IconButton, Tooltip } from '@chakra-ui/react'
 import { add, sub, format } from 'date-fns'
 import React from 'react'
-import { FaChevronLeft, FaChevronRight } from 'react-icons/fa'
+import DatePicker from 'react-datepicker'
+import { FaChevronLeft, FaChevronRight, FaCalendarAlt } from 'react-icons/fa'
 
 export const SelectWeek: React.FC<{
   activeDate: Date
@@ -18,9 +19,25 @@ export const SelectWeek: React.FC<{
           }}
         />
       </Tooltip>
-      <Box mx={20}>
+      <Flex mx={20} alignItems="center" justifyContent="center">
         {format(activeDate, 'dd/MM/YYY')} (Week {format(activeDate, 'w')})
-      </Box>
+        <Box ml={4}>
+          <DatePicker
+            selected={activeDate}
+            onChange={(date: Date) => {
+              setActiveDate(date)
+            }}
+            dateFormat="dd/MM/yyy"
+            customInput={
+              <IconButton
+                aria-label="Open calendar"
+                icon={<FaCalendarAlt />}
+                size="sm"
+              />
+            }
+          />
+        </Box>
+      </Flex>
       <Tooltip label="Next week">
         <IconButton
           aria-label="Next week"
