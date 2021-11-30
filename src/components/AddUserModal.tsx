@@ -48,6 +48,7 @@ export const AddUserModal: React.FC<UseDisclosureReturn> = ({ isOpen, onClose })
         <ModalCloseButton />
 
         <form
+          data-testid="add-user-form"
           onSubmit={handleSubmit((data) => {
             dispatch(
               addUser({
@@ -75,7 +76,12 @@ export const AddUserModal: React.FC<UseDisclosureReturn> = ({ isOpen, onClose })
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme="blue" mr={3} type="submit">
+            <Button
+              colorScheme="blue"
+              mr={3}
+              type="submit"
+              data-testid="submit-user-form"
+            >
               Save
             </Button>
           </ModalFooter>

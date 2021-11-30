@@ -25,7 +25,7 @@ const AuthorizationBouncer: React.FC = ({ children }) => {
   }
 
   return (
-    <Box position="relative">
+    <Box position="relative" data-testid="authorization-bouncer">
       <Box pointerEvents="none" opacity={0.6}>
         {children}
       </Box>

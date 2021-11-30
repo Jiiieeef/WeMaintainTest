@@ -19,6 +19,7 @@ export const TopBar: React.FC = () => {
           <Tooltip label="Add user" hasArrow placement="bottom">
             <IconButton
               aria-label="Add user"
+              data-testid="add-user-button"
               icon={<FaPlusCircle />}
               onClick={onOpen}
             />
