@@ -39,7 +39,7 @@ export const useGetEventStyles = (
     const isEndOfEvent =
       event && add(startOfHour, { hours: 1 }).getTime() === event.endDate
 
-    const border = { border: '1px solid black' }
+    const border = { border: '1px solid #20639B', bgColor: '#3CAEA377' }
     const borderTop = isBeginningOfEvent
       ? { borderTopLeftRadius: 4, borderTopRightRadius: 4 }
       : { borderTopWidth: 0 }

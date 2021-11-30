@@ -14,7 +14,13 @@ export const Day: React.FC<{ date: Date; hoursGridProps?: GridProps }> = ({
       <Text textAlign="center" fontWeight="bold" mb={10}>
         {format(startOfDay, 'dd/MM/yyyy')}
       </Text>
-      <Grid templateColumns="repeat(1fr, 24)" px={4} {...hoursGridProps}>
+      <Grid
+        templateColumns="repeat(1fr, 24)"
+        px={4}
+        {...hoursGridProps}
+        borderRightStyle="solid"
+        borderRightColor="primary.500"
+      >
         {Array.from({ length: 24 }, (_, index) => (
           <Hour key={index} hour={index} date={startOfDay} />
         ))}

@@ -40,6 +40,7 @@ export const Hour: React.FC<{ hour: number; date: Date }> = ({ hour, date }) => 
       <Box
         key={hour}
         h={50}
+        p={1}
         _hover={{ cursor: 'pointer', '& .hour': { fontWeight: 'bold' } }}
         sx={{
           ...border,

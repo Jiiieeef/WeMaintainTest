@@ -13,7 +13,7 @@ export const Week: React.FC<{ startOfWeek: Date }> = ({ startOfWeek }) => {
           <Day
             key={index}
             date={date}
-            hoursGridProps={{ borderRight: index < 6 ? '1px solid black' : undefined }}
+            hoursGridProps={{ borderRightWidth: index < 6 ? '1px' : undefined }}
           />
         )
       })}
