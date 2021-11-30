@@ -20,7 +20,8 @@ export const SelectWeek: React.FC<{
         />
       </Tooltip>
       <Flex mx={20} alignItems="center" justifyContent="center">
-        {format(activeDate, 'dd/MM/YYY')} (Week {format(activeDate, 'w')})
+        {format(activeDate, 'dd/MM/YYY')}{' '}
+        <span data-testid="active-week">(Week {format(activeDate, 'w')})</span>
         <Box ml={4}>
           <DatePicker
             selected={activeDate}
