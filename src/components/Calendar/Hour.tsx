@@ -38,6 +38,7 @@ export const Hour: React.FC<{ hour: number; date: Date }> = ({ hour, date }) => 
   return (
     <>
       <Box
+        aria-label={format(startOfHour, 'dd/MM/yyyy HH:mm')}
         key={hour}
         h={50}
         p={1}
@@ -53,7 +54,7 @@ export const Hour: React.FC<{ hour: number; date: Date }> = ({ hour, date }) => 
           {format(startOfHour, 'HH:mm')}
         </Text>
         {activeUserEventsForDate && displayEventName && (
-          <Text>{activeUserEventsForDate.name}</Text>
+          <Text className="event-name">{activeUserEventsForDate.name}</Text>
         )}
       </Box>
       {isOpen && (

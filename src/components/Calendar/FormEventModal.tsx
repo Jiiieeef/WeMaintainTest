@@ -141,7 +141,7 @@ export const FormEventModal: React.FC<
               endDate={endDate}
             />
             {!!activeUserEventsForDate && (
-              <Alert mt={5} status="error">
+              <Alert mt={5} status="error" data-testid="events-overlap-error">
                 <AlertIcon />
                 There is already an event during this period.
               </Alert>
@@ -159,6 +159,7 @@ export const FormEventModal: React.FC<
                 isDisabled={!!activeUserEventsForDate}
                 colorScheme="blue"
                 type="submit"
+                data-testid="save-event"
               >
                 Save
               </Button>
@@ -179,9 +180,12 @@ const DeleteButton: React.FC<{ event: Event; onClose: () => void }> = ({
 
   return state ? (
     <Flex>
-      <Button onClick={() => setState(false)}>No</Button>
+      <Button data-testid="cancel-delete-event" onClick={() => setState(false)}>
+        No
+      </Button>
       <Button
         colorScheme="red"
+        data-testid="confirm-delete-event"
         ml={3}
         onClick={() => {
           dispatch(deleteEvent({ id: event.id }))
@@ -192,7 +196,7 @@ const DeleteButton: React.FC<{ event: Event; onClose: () => void }> = ({
       </Button>
     </Flex>
   ) : (
-    <Button colorScheme="red" onClick={() => setState(true)}>
+    <Button colorScheme="red" data-testid="delete-event" onClick={() => setState(true)}>
       Delete
     </Button>
   )
@@ -231,7 +235,7 @@ const ControlledDateRangePicker: React.FC<{
               timeFormat="HH:mm"
               timeIntervals={60}
               dateFormat="dd/MM/yyy HH:mm"
-              customInput={<CustomDateRangeInput />}
+              customInput={<CustomDateRangeInput dataTestId="event-start-date" />}
               onChange={(date) => {
                 onChange(date)
                 onBlur()
@@ -278,7 +282,7 @@ const ControlledDateRangePicker: React.FC<{
               timeFormat="HH:mm"
               timeIntervals={60}
               dateFormat="dd/MM/yyy HH:mm"
-              customInput={<CustomDateRangeInput />}
+              customInput={<CustomDateRangeInput dataTestId="event-end-date" />}
             />
           )}
         />
@@ -299,5 +303,8 @@ const CustomDateRangeInput = React.forwardRef<
   {
     value?: string
     onClick?: () => void
+    dataTestId: string
   }
->(({ value, onClick }, ref) => <Input readOnly value={value} onClick={onClick} />)
+>(({ value, onClick, dataTestId }, ref) => (
+  <Input readOnly value={value} onClick={onClick} data-testid={dataTestId} />
+))
